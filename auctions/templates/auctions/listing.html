@@ -1,0 +1,98 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<br>
+  <div class="row mx-3">
+    {% if user.is_authenticated %}
+      {% if trueowner and Listing.isActive %}
+      <form action="{% url 'closeauction' id=Listing.id %}" method="POST" class="mx-3">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Close Auction</a>
+    </form>
+      {% endif %}
+      {% if listwatchlist %}
+        <form action="{% url 'removewatchlist' id=Listing.id %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning">Remove from watchlist</a>
+        </form>
+       {% else %}
+       <form action="{% url 'addwatchlist' id=Listing.id %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Add to watchlist</a>
+    </form>
+       {%endif%}
+      {% endif %}
+  </div><br>
+     {% if update == 1 %}
+    <div class="alert alert-dark" role="alert" style="text-align: center;">
+      {{message}}
+    </div>{% endif %}{% if update == 2 %}
+    <div class="alert alert-dark" role="alert" style="text-align: center;">
+      {{message}}
+    </div>
+    {% endif %}{% if update == 3 %}
+    <div class="alert alert-dark" role="alert" style="text-align: center;visibility: hidden;">
+      {{message}}
+    </div>
+    {% endif %}
+  <br>
+  
+  {% if not Listing.isActive and user == Listing.price.user %}
+  <div class="alert alert-success" role="alert" style="text-align: center;" >
+    Excellent! you have won the auction
+  </div>
+  {% endif %}<br>
+    <h3>{{Listing.title}}</h3><br>
+    <div class="col-12">
+        <div class="row no-gutters">
+            <div class="col-md-4">
+              <img src="{{Listing.image}}" class="card-img" alt="...">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">{{Listing.title}}</h5>
+                <p class="card-text">{{Listing.description}}</p>
+                <p class="card-text"><small class="text-muted">Price: ${{Listing.price.bid}}</small></p><br>
+                <a href="" class="btn btn-primary">Get item</a>
+                <p class="card-text"><small class="text-muted">Owner: {{Listing.owner}}</small></p>
+                
+              </div>
+            </div>
+          </div>  
+        
+    </div><br>
+   
+      {% if user.is_authenticated %}
+        <form action="{% url 'newcomment' id=Listing.id %}" method="POST">
+          {%csrf_token%}
+          <div class="row mx-3" style="max-width: 700px;">
+            <label for="newcomment">New comment</label>
+            <textarea name="newcomment" class="form-control" id="newcomment" placeholder="Add a comment" rows="4" ></textarea>
+          </div><br>
+          <div class="row mx-3" style="max-width: 540px;">
+            <button type="submit" class="btn btn-primary">Save comment</button>
+          </div>
+          
+          </form>
+        {% endif %}
+  <br>
+  
+  {% if user.is_authenticated %}
+        <form action="{% url 'newbid' id=Listing.id %}" method="POST">
+          {%csrf_token%}
+          <div class="form-group" >
+            <label for="newbid">Add a bid: </label>
+            <input name="newbid" min="0"  id="newbid" placeholder="Add a bid" rows="1" >
+            <button type="submit" class="btn btn-primary">Save bid</button>
+          </div><br>
+          
+          </form>
+        {% endif %}<br>
+  <ul class="list-group">
+    {% for comment in comments%}
+    <li class="list-group-item">{{comment.message}}<br>
+      <p class="card-text"><small class="text-muted">commented by: {{comment.creater}}</small></p><br>
+    </li>
+    {%endfor%}
+  </ul><br>
+{% endblock %}
